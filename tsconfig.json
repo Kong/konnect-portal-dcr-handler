@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    // "strict": true,
+    "target": "es6",
+    "module": "commonjs",
+    "removeComments": true,
+    "sourceMap": true,
+    "newLine": "lf",
+    "esModuleInterop": true,
+    "baseUrl": "./src",
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "paths": {
+      "#app/*": ["*"]
+    },
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "typeRoots": ["./src/types.d.ts", "./node_modules/@types"],
+    "lib": ["ES2018"]
+  },
+  "include": ["./src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

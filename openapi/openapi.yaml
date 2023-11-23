@@ -1,0 +1,289 @@
+openapi: 3.0.3
+info:
+  title: DCR HTTP integration
+  version: 0.0.1
+  description: |
+    Specification of the open api spec that should be implemented to
+    support the konnect DCR http integration.
+
+    Note: The spec defines strict return code but Konnect will handle
+    every 2XX as a success. However regarding the 400 error please follow
+    the data structure definition otherwise as a Konnect admin if an error
+    is occuring you might miss some informations while debugging the integration.
+paths:
+  /:
+    post:
+      summary: Create application
+      description: Creates a new application in the IDP
+      requestBody:
+        $ref: '#/components/requestBodies/NewApplication'
+      responses:
+        '201':
+          $ref: '#/components/responses/NewApplication'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /{applicationId}:
+    parameters:
+    - $ref: '#/components/parameters/applicationId'
+    delete:
+      summary: Delete application
+      description: Deletes the application in the IDP
+      responses:
+        '204':
+          description: properly deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /{applicationId}/new-secret:
+    parameters:
+    - $ref: '#/components/parameters/applicationId'
+    post:
+      summary: rotates client_secret
+      description: |
+        Rotates the secret of the application, making the current one unusable.
+      responses:
+        '200':
+          $ref: '#/components/responses/NewSecret'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /{applicationId}/event-hook:
+    parameters:
+    - $ref: '#/components/parameters/applicationId'
+    post:
+      summary: Application lifecycle webhook
+      description: |
+        This optional webhook can be activated or deactivated in your portal configuration.
+        Some IDPs can require feature enablement when registering an application to a product,
+        with this webhook you can also add the functionality. This is optional in the application
+        registration flow.
+      requestBody:
+        $ref: '#/components/requestBodies/EventHook'
+      responses:
+        '200':
+          description: properly sent
+        '400':
+          $ref: '#/components/responses/BadRequest'
+components:
+  parameters:
+    applicationId:
+      name: applicationId
+      in: path
+      required: true
+      description: lorem ipsum
+      schema:
+        type: string
+  requestBodies:
+    EventHook:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EventHook'
+    NewApplication:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApplicationPayload'
+  responses:
+    BadRequest:
+      description: f
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestResponse'
+    NewApplication:
+      description: f
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApplicationResponse'
+    NewSecret:
+      description: f
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SecretResponse'
+  schemas:
+    ClientId:
+      type: string
+      description: |
+        ID of the application in the IDP. This is the ID used accross
+        the system and is unique. The format can vary between IDPs.
+      example: cb9z3HSYhw
+    ClientSecret:
+      type: string
+      description: |
+        Secret of the application, this is used for the application to make
+        calls to the IDP and verify its identity. Konnect doesn't store this
+        data, if the secret is lost user should refresh the secret.
+      example: "*8pNH%|(9PRH|r3q$#6!*z0B}jMbtQ]-"
+    EventType:
+      type: string
+      enum:
+      - update_application
+      - add_registration
+      - remove_registration
+    EventHook:
+      type: object
+      additionalProperties: false
+      allOf:
+        - $ref: '#/components/schemas/EventHookBase'
+        - discriminator:
+            propertyName: event_type
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/EventHookUpdateApplication'
+            - $ref: '#/components/schemas/EventHookAddRegistration'
+            - $ref: '#/components/schemas/EventHookRemoveRegistration'
+    EventHookBase:
+      additionalProperties: false
+      properties:
+        event_type:
+          $ref: '#/components/schemas/EventType'
+        client_id:
+          $ref: '#/components/schemas/ClientId'
+        application_id:
+          type: string
+          format: uuid
+          description: |
+            ID of the application in the Konnect system
+        application_name:
+          type: string
+        application_description:
+          type: string
+        portal_id:
+          type: string
+          format: uuid
+        organization_id:
+          type: string
+          format: uuid
+      required:
+      - event_type
+      - client_id
+      - application_id
+      - application_name
+      - application_description
+      - portal_id
+      - organization_id
+    EventHookUpdateApplication:
+      additionalProperties: false
+      properties:
+        event_type:
+          type: string
+          enum: [update_application]
+      required:
+      - event_type
+    EventHookAddRegistration:
+      additionalProperties: false
+      properties:
+        api_product_version_id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum: [add_registration]
+        audience:
+          $ref: '#/components/schemas/ApplicationAudience'
+          format: uuid
+      required:
+      - event_type
+      - api_product_version_id
+    EventHookRemoveRegistration:
+      additionalProperties: false
+      properties:
+        api_product_version_id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum: [remove_registration]
+        audience:
+          $ref: '#/components/schemas/ApplicationAudience'
+      required:
+      - event_type
+      - api_product_version_id
+    ApplicationAudience:
+      type: string
+      description: Application audience
+    BadRequestResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Summary of the error
+        error_description:
+          type: string
+          description: Full description of the error
+      required:
+      - error
+      - error_description
+    ApplicationPayload:
+      type: object
+      additionalProperties: false
+      properties:
+        redirect_uris:
+          type: array
+          items:
+            type: string
+        client_name:
+          type: string
+        grant_types:
+          type: array
+          items:
+            type: string
+        token_endpoint_auth_method:
+          type: string
+        application_description:
+          type: string
+        portal_id:
+          type: string
+          format: uuid
+        organization_id:
+          type: string
+          format: uuid
+      required:
+      - redirect_uris
+      - client_name
+      - grant_types
+      - token_endpoint_auth_method
+      - application_description
+      - portal_id
+      - organization_id
+    ApplicationResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        client_id:
+          $ref: '#/components/schemas/ClientId'
+        client_secret:
+          $ref: '#/components/schemas/ClientSecret'
+        client_id_issued_at:
+          type: string
+          format: date-time
+          description: Date when the client_id has been created
+        client_secret_expires_at:
+          type: string
+          format: date-time
+          description: Date when the client_id expires
+      required:
+      - client_id
+      - client_secret
+    SecretResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        client_id:
+          $ref: '#/components/schemas/ClientId'
+        client_secret:
+          $ref: '#/components/schemas/ClientSecret'
+      required:
+      - client_id
+      - client_secret
+  securitySchemes:
+    APIKEY:       
+      description: lorem ipsum
+      type: apiKey
+      in: header      
+      name: X-API-KEY
+security:
+  - APIKEY: []

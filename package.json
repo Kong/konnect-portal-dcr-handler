@@ -1,0 +1,24 @@
+{
+  "name": "httpDCR-demo",
+  "packageManager": "yarn@4.0.2",
+  "dependencies": {
+    "aws-lambda-fastify": "^2.2.0",
+    "axios": "^1.6.2",
+    "fastify": "^4.24.3"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.12.0",
+    "eslint": "^8.0.1",
+    "eslint-config-standard-with-typescript": "^40.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
+    "eslint-plugin-promise": "^6.0.0",
+    "typescript": "*"
+  },
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
+  }
+}

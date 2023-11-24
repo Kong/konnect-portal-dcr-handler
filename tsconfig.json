@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     // "strict": true,
     "target": "es6",
@@ -11,9 +12,6 @@
     "baseUrl": "./src",
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "paths": {
-      "#app/*": ["*"]
-    },
     "moduleResolution": "node",
     "outDir": "dist",
     "typeRoots": ["./src/types.d.ts", "./node_modules/@types"],

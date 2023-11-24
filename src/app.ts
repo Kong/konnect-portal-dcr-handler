@@ -1,29 +1,44 @@
 import fastify from 'fastify'
-import { createApplicationHandler, deleteApplicationHandler, createNewSecretHandler, postEventHookHandler } from './handlers/handler'
-import { type ApplicationPayload, ApplicationPayloadSchema } from '../openapi/ApplicationPayload'
-import { type ClientSecret, ClientSecretSchema } from '../openapi/ClientSecret'
-import { type EventHook, EventHookSchema } from '../openapi/EventHook'
+import { createApplication, deleteApplication, refreshSecret, eventHook } from './handlers/handler'
+import fastifyEnv from '@fastify/env'
+import axios, { AxiosInstance } from 'axios'
 
-function init() {
-const app = fastify({ logger: true })
-  app.post<{ Body: ApplicationPayload }>('/', {
+interface serviceConfig {
+  isLambda?: boolean
+  httpClient?: AxiosInstance
+}
+
+// const app = fastify({ logger: true })
+export async function init (config: serviceConfig) {
+  const app = fastify()
+
+  await app.register(fastifyEnv, {
     schema: {
-      body: ApplicationPayloadSchema
+      type: 'object',
+      required: ['OKTA_API_TOKEN', 'OKTA_DOMAIN', 'KONG_API_TOKEN'],
+      properties: {
+        KONG_API_TOKEN: { type: 'string' },
+        OKTA_API_TOKEN: { type: 'string' },
+        OKTA_DOMAIN: { type: 'string' }
+      }
     },
-    handler: createApplicationHandler
+    dotenv: true
   })
 
-  app.delete('/:application_id', {handler: deleteApplicationHandler})
+  if (!config.httpClient) {
+    console.log('no client')
+    config.httpClient = axios.create({ baseURL: app.config.OKTA_DOMAIN })
+  }
 
-  app.post('/:application_id/new-secret', {handler: createNewSecretHandler})
+  app.decorate('httpClient', config.httpClient)
 
-  app.post<{ Body: EventHook }>('/:application_id/event-hook',
-      {
-        schema: {
-          body: EventHookSchema
-        },
-        handler: postEventHookHandler
-      })
+  app.register(createApplication)
+
+  app.register(deleteApplication)
+
+  app.register(refreshSecret)
+
+  app.register(eventHook)
 
   app.setErrorHandler((error, request, reply) => {
     if (error.validation) {
@@ -40,24 +55,37 @@ const app = fastify({ logger: true })
     }
   })
 
+  if (!config.isLambda) {
+    app.listen({
+      port: 3000
+    }, (err) => {
+      if (err) console.error(err)
+    }
+    )
+  }
+
   return app
 }
 
 if (require.main === module) {
-  init().listen(3000, '0.0.0.0', (err) => {
-    if (err) console.error(err)
-  })
-}else{
-  module.exports = init
+  (async () => {
+    try {
+      const app = await init({ isLambda: false })
+      console.log('Server started')
+    } catch (error) {
+      console.error('Error starting the application:', error)
+      process.exit(1)
+    }
+  })()
 }
 
-export default app
-
-  try {
-    await app.listen({ port: 3000 })
-  } catch (err) {
-    app.log.error(err)
-    process.exit(1)
+declare module 'fastify' {
+  interface FastifyInstance {
+    httpClient: AxiosInstance
+    config: {
+      KONG_API_TOKEN: string
+      OKTA_API_TOKEN: string
+      OKTA_DOMAIN: string
+    }
   }
-
-
+}

@@ -4,12 +4,10 @@ import fastifyEnv from '@fastify/env'
 import axios, { AxiosInstance } from 'axios'
 
 interface serviceConfig {
-  isLambda?: boolean
   httpClient?: AxiosInstance
 }
 
-// const app = fastify({ logger: true })
-export async function init (config: serviceConfig) {
+export async function init (config: serviceConfig = {}) {
   const app = fastify()
 
   await app.register(fastifyEnv, {
@@ -26,9 +24,9 @@ export async function init (config: serviceConfig) {
   })
 
   if (!config.httpClient) {
-    console.log('no client')
     config.httpClient = axios.create({ baseURL: app.config.OKTA_DOMAIN })
   }
+  console.log(app.config)
 
   app.decorate('httpClient', config.httpClient)
 
@@ -39,6 +37,15 @@ export async function init (config: serviceConfig) {
   app.register(refreshSecret)
 
   app.register(eventHook)
+
+  app.addHook('preHandler', (request, reply, done) => {
+    const apiKey = request.headers['x-api-key']
+    if (!apiKey || apiKey !== app.config.KONG_API_TOKEN) {
+      reply.code(400).send({ error: 'Wrong API-Key', error_description: 'wrong x-api-key header' })
+    } else {
+      done()
+    }
+  })
 
   app.setErrorHandler((error, request, reply) => {
     if (error.validation) {
@@ -55,22 +62,14 @@ export async function init (config: serviceConfig) {
     }
   })
 
-  if (!config.isLambda) {
-    app.listen({
-      port: 3000
-    }, (err) => {
-      if (err) console.error(err)
-    }
-    )
-  }
-
   return app
 }
 
 if (require.main === module) {
   (async () => {
     try {
-      const app = await init({ isLambda: false })
+      const app = await init()
+      await app.listen({ port: 3000 })
       console.log('Server started')
     } catch (error) {
       console.error('Error starting the application:', error)

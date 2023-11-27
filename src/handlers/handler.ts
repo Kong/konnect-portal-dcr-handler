@@ -87,9 +87,9 @@ export function eventHook (fastify: FastifyInstance, opts: RegisterOptions, next
     schema: {
       body: EventHookSchema
     },
-    handler: async function (request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    handler: async function (request: FastifyRequest<{ Params: { application_id: string }, Body: {EventHook} }>, reply: FastifyReply): Promise<void> {
       console.log(request.body)
-      await reply.code(200)
+      await reply.code(200).send()
     }
   })
 

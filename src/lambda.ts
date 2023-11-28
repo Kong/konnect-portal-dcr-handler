@@ -1,6 +1,9 @@
 import awsLambdaFastify from 'aws-lambda-fastify'
-import init from './app'
+import { init } from './app'
 
-const proxy = awsLambdaFastify(init())
+async function createHandler () {
+  const app = await init()
+  return awsLambdaFastify(app)
+}
 
-module.exports.handler = proxy
+module.exports.handler = createHandler()

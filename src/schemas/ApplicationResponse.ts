@@ -33,7 +33,7 @@ export const ApplicationResponseSchema = {
     },
     client_secret: {
       type: 'string',
-      description: "Secret of the application, this is used for the application to make\ncalls to the IDP and verify its identity. Konnect doesn't store this\ndata, if the secret is lost user should refresh the secret.\n",
+      description: 'Secret of the application, this is used for the application to make\ncalls to the IDP and verify its identity. Konnect doesn\'t store this\ndata, if the secret is lost user should refresh the secret.\n',
       example: '*8pNH%|(9PRH|r3q$#6!*z0B}jMbtQ]-'
     },
     client_id_issued_at: {

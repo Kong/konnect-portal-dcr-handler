@@ -27,7 +27,7 @@ jobs:
         yarn build
         cp package.json dist/package.json
         cd dist
-        yarn --production
+        yarn --production --frozen-lockfile
     - name: zip
       run: |
         cd dist &&  zip -r ../build.zip *

@@ -4,7 +4,17 @@ import { ApplicationPayload, ApplicationPayloadSchema } from '../schemas/Applica
 import { EventHookSchema } from '../schemas/EventHook'
 import { join } from 'path'
 
-export function createApplication (fastify: FastifyInstance, opts: RegisterOptions, next: (err?: Error) => void): void {
+export function DCRHandlers (fastify: FastifyInstance, opts: RegisterOptions, next: (err?: Error) => void): void {
+  fastify.addHook('preHandler', (request, reply, done) => {
+    const apiKey = request.headers['x-api-key'] as string
+
+    if (!apiKey || !fastify.config.KONG_API_TOKENS.includes(apiKey)) {
+      reply.code(401).send({ error: 'Wrong API-Key', error_description: 'wrong x-api-key header' })
+    } else {
+      done()
+    }
+  })
+
   fastify.route({
     url: '/',
     method: 'POST',
@@ -38,10 +48,7 @@ export function createApplication (fastify: FastifyInstance, opts: RegisterOptio
       await reply.code(201).send({ application })
     }
   })
-  next()
-}
 
-export function deleteApplication (fastify: FastifyInstance, opts: RegisterOptions, next: (err?: Error) => void): void {
   fastify.route({
     url: '/:application_id',
     method: 'DELETE',
@@ -55,10 +62,7 @@ export function deleteApplication (fastify: FastifyInstance, opts: RegisterOptio
       await reply.code(204).send()
     }
   })
-  next()
-}
 
-export function refreshSecret (fastify: FastifyInstance, opts: RegisterOptions, next: (err?: Error) => void): void {
   fastify.route({
     url: '/:application_id/new-secret',
     method: 'POST',
@@ -77,10 +81,6 @@ export function refreshSecret (fastify: FastifyInstance, opts: RegisterOptions, 
     }
   })
 
-  next()
-}
-
-export function eventHook (fastify: FastifyInstance, opts: RegisterOptions, next: (err?: Error) => void): void {
   fastify.route({
     url: '/:application_id/event-hook',
     method: 'POST',
@@ -88,7 +88,6 @@ export function eventHook (fastify: FastifyInstance, opts: RegisterOptions, next
       body: EventHookSchema
     },
     handler: async function (request: FastifyRequest<{ Params: { application_id: string }, Body: { EventHook } }>, reply: FastifyReply): Promise<void> {
-      console.log(request.body)
       await reply.code(200).send()
     }
   })

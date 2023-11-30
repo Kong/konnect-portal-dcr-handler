@@ -22,6 +22,8 @@ paths:
           $ref: '#/components/responses/NewApplication'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /{applicationId}:
     parameters:
     - $ref: '#/components/parameters/applicationId'
@@ -33,6 +35,8 @@ paths:
           description: properly deleted
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /{applicationId}/new-secret:
     parameters:
     - $ref: '#/components/parameters/applicationId'
@@ -45,6 +49,8 @@ paths:
           $ref: '#/components/responses/NewSecret'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /{applicationId}/event-hook:
     parameters:
     - $ref: '#/components/parameters/applicationId'
@@ -62,6 +68,8 @@ paths:
           description: properly sent
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 components:
   parameters:
     applicationId:
@@ -91,6 +99,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/BadRequestResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedResponse'
     NewApplication:
       description: f
       content:
@@ -217,6 +231,18 @@ components:
       required:
       - error
       - error_description
+    UnauthorizedResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Summary of the error
+        error_description:
+          type: string
+          description: Full description of the error
+      required:
+      - error
+      - error_description
     ApplicationPayload:
       type: object
       additionalProperties: false
@@ -280,10 +306,10 @@ components:
       - client_id
       - client_secret
   securitySchemes:
-    APIKEY:       
+    APIKEY:
       description: lorem ipsum
       type: apiKey
-      in: header      
+      in: header
       name: X-API-KEY
 security:
   - APIKEY: []

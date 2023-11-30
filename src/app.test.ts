@@ -41,7 +41,7 @@ describe('handlers', () => {
         url: '/',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-KEY': app.config.KONG_API_TOKEN
+          'X-API-KEY': app.config.KONG_API_TOKENS[0]
         },
         payload
       })
@@ -86,7 +86,7 @@ describe('handlers', () => {
         payload
       })
 
-      expect(resp.statusCode).toEqual(400)
+      expect(resp.statusCode).toEqual(401)
       expect(resp.body).toEqual(JSON.stringify({ error: 'Wrong API-Key', error_description: 'wrong x-api-key header' }))
       expect(mockAxios.post).not.toHaveBeenCalled()
 
@@ -112,7 +112,7 @@ describe('handlers', () => {
         url: '/',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-KEY': app.config.KONG_API_TOKEN
+          'X-API-KEY': app.config.KONG_API_TOKENS[0]
         },
         payload
       })
@@ -137,7 +137,27 @@ describe('handlers', () => {
         url: '/someId',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-KEY': app.config.KONG_API_TOKEN
+          'X-API-KEY': app.config.KONG_API_TOKENS[0]
+        }
+      })
+
+      expect(resp.statusCode).toEqual(204)
+      expect(mockAxios.delete).toHaveBeenCalledTimes(1)
+
+      await app.close()
+    })
+
+    it('succeed with both api key', async () => {
+      jest.spyOn(mockAxios, 'delete').mockResolvedValueOnce({ status: 200 } as any)
+
+      const app = await init({ httpClient: mockAxios })
+
+      const resp = await app.inject({
+        method: 'DELETE',
+        url: '/someId',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': app.config.KONG_API_TOKENS[1]
         }
       })
 
@@ -158,7 +178,7 @@ describe('handlers', () => {
         }
       })
 
-      expect(resp.statusCode).toEqual(400)
+      expect(resp.statusCode).toEqual(401)
       expect(resp.body).toEqual(JSON.stringify({ error: 'Wrong API-Key', error_description: 'wrong x-api-key header' }))
       expect(mockAxios.delete).not.toHaveBeenCalled()
 
@@ -181,7 +201,7 @@ describe('handlers', () => {
         method: 'POST',
         url: '/someID/new-secret',
         headers: {
-          'X-API-KEY': app.config.KONG_API_TOKEN
+          'X-API-KEY': app.config.KONG_API_TOKENS[0]
         }
       })
 
@@ -203,7 +223,7 @@ describe('handlers', () => {
         url: '/someID/new-secret'
       })
 
-      expect(resp.statusCode).toEqual(400)
+      expect(resp.statusCode).toEqual(401)
       expect(resp.body).toEqual(JSON.stringify({ error: 'Wrong API-Key', error_description: 'wrong x-api-key header' }))
       expect(mockAxios.post).not.toHaveBeenCalled()
 
@@ -230,7 +250,7 @@ describe('handlers', () => {
         url: '/someId/event-hook',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-KEY': app.config.KONG_API_TOKEN
+          'X-API-KEY': app.config.KONG_API_TOKENS[0]
         },
         payload
       })
@@ -262,7 +282,7 @@ describe('handlers', () => {
         payload
       })
 
-      expect(resp.statusCode).toEqual(400)
+      expect(resp.statusCode).toEqual(401)
       expect(resp.body).toEqual(JSON.stringify({ error: 'Wrong API-Key', error_description: 'wrong x-api-key header' }))
 
       await app.close()
@@ -285,7 +305,7 @@ describe('handlers', () => {
         url: '/someId/event-hook',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-KEY': app.config.KONG_API_TOKEN
+          'X-API-KEY': app.config.KONG_API_TOKENS[0]
         },
         payload
       })

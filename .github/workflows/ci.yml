@@ -1,0 +1,59 @@
+name: CI
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+on:
+  pull_request: {}
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version-file: '.nvmrc'
+    - name: install dependencies
+      run: yarn
+    - name: lint
+      run: yarn lint
+    - name: test
+      run: yarn test
+    - name: build
+      run: |
+        yarn build
+        cp package.json dist/package.json
+        cd dist
+        yarn --production
+    - name: zip
+      run: |
+        cd dist &&  zip -r ../build.zip *
+    # - name: Configure AWS credentials
+    #   if: github.ref == 'refs/heads/main'
+    #   uses: aws-actions/configure-aws-credentials@v3.0.1
+        # with:
+        #   role-to-assume: ${{ env.ECR_DEV_ROLE }}
+        #   aws-region: us-east-2
+        #   role-session-name: HttpDcrLambdaCiUsEast2
+        #   role-duration-seconds: 1200
+        #   mask-aws-account-id: 'false'
+    - name: Send to S3
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "send to s3 bucket"
+        # aws s3 cp ./build.zip s3://${{ env.BUCKET_NAME }}/lambda-dcr-http.zip \
+        #   --storage-class REDUCED_REDUNDANCY \
+        #   --acl private \
+        #   --no-progress
+    - name: Deploy Lambda function
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "deploy lambda function"
+        # aws lambda update-function-code \
+        #   --function-name ${{ env.FUNCTION_NAME }} \
+        #   --s3-bucket ${{ env.BUCKET_NAME }} \
+        #   --s3-key lambda-dcr-http.zip \
+        #   --publish

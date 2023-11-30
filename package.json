@@ -1,5 +1,5 @@
 {
-  "name": "httpDCR-demo",
+  "name": "konnect-portal-dcr-handler",
   "dependencies": {
     "@fastify/env": "4.3.0",
     "aws-lambda-fastify": "^2.2.0",

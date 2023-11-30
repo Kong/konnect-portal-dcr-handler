@@ -10,7 +10,6 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 .env
-.editorconfig
 .tap
 
 # Swap the comments on the following lines if you wish to use zero-installs
@@ -19,3 +18,4 @@ yarn-error.log*
 
 #!.yarn/cache
 .pnp.*
+dist

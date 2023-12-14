@@ -4,7 +4,7 @@
 
 This repository is an open source reference implementation of an HTTP DCR bridge to enable [Dynamic Client Registration][dcr-docs-url] integration between the [Konnect Dev Portal][portal-docs-url] and a third-party [Identity Provider][idp-wiki-url]. The HTTP DCR bridge acts as a proxy and translation layer between your IDP and DCR applications made in the Konnect Dev Portal.
 
-**NOTE: This repository contains an example HTTP DCR bridge implementation and is not meant to be deployed in production. We encourage you to use this a guide to create your own implementation.**
+**NOTE: This repository contains an example HTTP DCR bridge implementation and is not meant to be deployed in production. We encourage you to use this application as a guide to create your own implementation.**
 
 This project is utilized within our integration tests, employing Okta as the IDP, and deployed as a serverless solution on AWS Lambda.
 This design ensures that the Developer Portal remains implementation-agnostic with respect to the IDP implementation.

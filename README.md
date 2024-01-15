@@ -66,6 +66,45 @@ more information on the `ci` in [./github/workflows/ci.yml](./github/workflows/c
 The current deployment uses an [AWS Lambda](https://docs.aws.amazon.com/lambda/) and can be accessed via
 the [Kong Lambda Plugin](https://docs.konghq.com/hub/kong-inc/aws-lambda/).
 
+Please note that there's 2 entrypoints for the project:
+
+* **src/app.ts**: This one is used to locally test the application or run in a non lambda context
+* **src/lambda.ts**: This one wraps the app.ts into a lambda adapter which makes the application able to behave as a lambda app.
+
+Example deployment via terraform module:
+
+```terraform
+module "dcr_http_lambda" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "6.5.0"
+
+  function_name = "name of my function"
+  runtime       = "nodejs20.x"
+  timeout       = 10
+
+  package_type   = "Zip"
+  publish        = true
+  create_package = false
+  handler        = "lambda.handler" // Note that this is the "lambda.ts" file and the name of the exported function
+
+  // bucket where you want to deploy the function
+  s3_existing_package = {
+    bucket = aws_s3_bucket.this.id
+    key    = "lambda-dcr-http.zip"
+  }
+
+  // Tokens should be stored in SSM
+  environment_variables = {
+    OKTA_API_TOKEN  = data.aws_ssm_parameter.okta_api_token.value
+    OKTA_DOMAIN     = data.aws_ssm_parameter.okta_domain.value
+    KONG_API_TOKENS = data.aws_ssm_parameter.kong_api_tokens.value
+  }
+
+  cloudwatch_logs_retention_in_days = var.cloudwatch_log_retention_days
+  cloudwatch_logs_kms_key_id        = data.aws_kms_alias.cloudwatch_logs.target_key_arn
+}
+```
+
 ## Join the Community
 
 * Join the Kong discussions at the Kong Nation forum: [https://discuss.konghq.com/](https://discuss.konghq.com/)

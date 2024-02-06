@@ -15,6 +15,7 @@ export type EventHook = {
   application_description: string
   portal_id: string
   organization_id: string
+  developer_id: string
 } & (
   | {
     event_type: 'update_application'
@@ -64,6 +65,9 @@ export const EventHookSchema = {
     organization_id: {
       type: 'string'
     },
+    developer_id: {
+      type: 'string'
+    },
     api_product_version_id: {
       type: 'string'
     },
@@ -80,7 +84,8 @@ export const EventHookSchema = {
       'application_name',
       'application_description',
       'portal_id',
-      'organization_id'
+      'organization_id',
+      'developer_id'
     ],
   allOf: [
     {

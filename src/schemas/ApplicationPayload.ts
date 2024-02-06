@@ -6,6 +6,7 @@ export interface ApplicationPayload {
   application_description: string
   portal_id: string
   organization_id: string
+  developer_id: string
 }
 
 export const ApplicationPayloadSchema = {

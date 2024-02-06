@@ -28,7 +28,8 @@ describe('dcr handlers', () => {
         token_endpoint_auth_method: 'client_secret_post',
         application_description: 'disisatest',
         portal_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2705',
-        organization_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2706'
+        organization_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2706',
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
       }
 
       jest.spyOn(mockAxios, 'post').mockResolvedValueOnce({
@@ -76,7 +77,8 @@ describe('dcr handlers', () => {
         token_endpoint_auth_method: 'client_secret_post',
         application_description: 'disisatest',
         portal_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2705',
-        organization_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2706'
+        organization_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2706',
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
       }
 
       const resp = await app.inject({
@@ -104,7 +106,8 @@ describe('dcr handlers', () => {
         token_endpoint_auth_method: 'client_secret_post',
         application_description: 'disisatest',
         portal_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2705',
-        organization_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2706'
+        organization_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2706',
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
       }
 
       const resp = await app.inject({
@@ -224,7 +227,8 @@ describe('dcr handlers', () => {
         application_name: 'name',
         application_description: 'description',
         portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
-        organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8'
+        organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
       }
 
       const resp = await app.inject({
@@ -250,7 +254,8 @@ describe('dcr handlers', () => {
         application_name: 'name',
         application_description: 'description',
         portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
-        organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8'
+        organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
       }
 
       const resp = await app.inject({
@@ -277,7 +282,8 @@ describe('dcr handlers', () => {
         application_name: 'name',
         application_description: 'description',
         portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
-        organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8'
+        organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
       }
 
       const resp = await app.inject({
@@ -302,7 +308,8 @@ describe('dcr handlers', () => {
         application_name: 'name',
         application_description: 'description',
         portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
-        organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8'
+        organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
       }
 
       const resp = await app.inject({

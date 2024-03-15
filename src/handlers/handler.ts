@@ -63,13 +63,13 @@ export function DCRHandlers (fastify: FastifyInstance, _: RegisterOptions, next:
   })
 
   fastify.route({
-    url: '/:application_id',
+    url: '/:client_id',
     method: 'DELETE',
-    handler: async function (request: FastifyRequest<{ Params: { application_id: string } }>, reply: FastifyReply): Promise<FastifyReply> {
+    handler: async function (request: FastifyRequest<{ Params: { client_id: string } }>, reply: FastifyReply): Promise<FastifyReply> {
       const headers = getHeaders(fastify.config.OKTA_API_TOKEN)
 
       await fastify.httpClient.delete(
-        `oauth2/v1/clients/${request.params.application_id}`,
+        `oauth2/v1/clients/${request.params.client_id}`,
         { headers }
       )
       return reply.code(204).send()
@@ -77,30 +77,30 @@ export function DCRHandlers (fastify: FastifyInstance, _: RegisterOptions, next:
   })
 
   fastify.route({
-    url: '/:application_id/new-secret',
+    url: '/:client_id/new-secret',
     method: 'POST',
-    handler: async function (request: FastifyRequest<{ Params: { application_id: string } }>, reply: FastifyReply): Promise<FastifyReply> {
+    handler: async function (request: FastifyRequest<{ Params: { client_id: string } }>, reply: FastifyReply): Promise<FastifyReply> {
       const headers = getHeaders(fastify.config.OKTA_API_TOKEN)
       const response = await fastify.httpClient.post(
-        `oauth2/v1/clients/${request.params.application_id}/lifecycle/newSecret`,
+        `oauth2/v1/clients/${request.params.client_id}/lifecycle/newSecret`,
         {},
         { headers }
       )
 
       return reply.code(200).send({
-        client_id: request.params.application_id,
+        client_id: request.params.client_id,
         client_secret: response.data.client_secret
       })
     }
   })
 
   fastify.route({
-    url: '/:application_id/event-hook',
+    url: '/:client_id/event-hook',
     method: 'POST',
     schema: {
       body: EventHookSchema
     },
-    handler: async function (request: FastifyRequest<{ Params: { application_id: string }, Body: { EventHook } }>, reply: FastifyReply): Promise<FastifyReply> {
+    handler: async function (request: FastifyRequest<{ Params: { client_id: string }, Body: { EventHook } }>, reply: FastifyReply): Promise<FastifyReply> {
       return reply.code(200).send()
     }
   })

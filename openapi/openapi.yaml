@@ -24,9 +24,9 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  /{applicationId}:
+  /{clientId}:
     parameters:
-    - $ref: '#/components/parameters/applicationId'
+    - $ref: '#/components/parameters/clientId'
     delete:
       summary: Delete application
       description: Deletes the application in the IDP
@@ -37,9 +37,9 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  /{applicationId}/new-secret:
+  /{clientId}/new-secret:
     parameters:
-    - $ref: '#/components/parameters/applicationId'
+    - $ref: '#/components/parameters/clientId'
     post:
       summary: rotates client_secret
       description: |
@@ -51,9 +51,9 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  /{applicationId}/event-hook:
+  /{clientId}/event-hook:
     parameters:
-    - $ref: '#/components/parameters/applicationId'
+    - $ref: '#/components/parameters/clientId'
     post:
       summary: Application lifecycle webhook
       description: |
@@ -72,11 +72,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   parameters:
-    applicationId:
-      name: applicationId
+    clientId:
+      name: clientId
       in: path
       required: true
-      description: lorem ipsum
+      description: |
+        ID of the application in the IDP. This is the ID used accross
+        the system and is unique. The format can vary between IDPs.
       schema:
         type: string
   requestBodies:

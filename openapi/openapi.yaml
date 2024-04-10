@@ -191,8 +191,13 @@ components:
         event_type:
           type: string
           enum: [update_application]
+        redirect_uris:
+          type: array
+          items:
+            type: string
       required:
       - event_type
+      - redirect_uris
     EventHookAddRegistration:
       additionalProperties: false
       properties:

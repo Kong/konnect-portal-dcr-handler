@@ -228,7 +228,10 @@ describe('dcr handlers', () => {
         application_description: 'description',
         portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
         organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
-        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        redirect_uris: [
+          'https://example.com'
+        ]
       }
 
       const resp = await app.inject({
@@ -309,7 +312,10 @@ describe('dcr handlers', () => {
         application_description: 'description',
         portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
         organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
-        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        redirect_uris: [
+          'https://example.com'
+        ]
       }
 
       const resp = await app.inject({

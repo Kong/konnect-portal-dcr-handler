@@ -18,6 +18,7 @@ export type EventHook = {
   developer_id: string
 } & (
   | {
+    redirect_uris: string[]
     event_type: 'update_application'
   }
   | {
@@ -94,9 +95,18 @@ export const EventHookSchema = {
           properties: {
             event_type: {
               const: 'update_application'
+            },
+            redirect_uris: {
+              type: 'array',
+              items: {
+                type: 'string'
+              }
             }
           },
-          required: ['event_type']
+          required: [
+            'event_type',
+            'redirect_uris'
+          ]
         },
         {
           properties: {

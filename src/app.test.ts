@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify'
 import { init } from './app'
 import { AxiosInstance } from 'axios'
 import { ApplicationPayload } from './schemas/ApplicationPayload'
+import { EventHook } from 'schemas/EventHook'
 
 const mockAxios = jest.genMockFromModule<AxiosInstance>('axios')
 let app: FastifyInstance
@@ -25,11 +26,16 @@ describe('dcr handlers', () => {
         grant_types: [
           'authorization_code', 'refresh_token', 'implicit'
         ],
+        scopes: [
+          'openid', 'profile'
+        ],
         token_endpoint_auth_method: 'client_secret_post',
         application_description: 'disisatest',
         portal_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2705',
         organization_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2706',
-        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        auth_strategy_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2708',
+        dcr_provider_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2709'
       }
 
       jest.spyOn(mockAxios, 'post').mockResolvedValueOnce({
@@ -74,11 +80,16 @@ describe('dcr handlers', () => {
         grant_types: [
           'authorization_code', 'refresh_token', 'implicit'
         ],
+        scopes: [
+          'openid', 'profile'
+        ],
         token_endpoint_auth_method: 'client_secret_post',
         application_description: 'disisatest',
         portal_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2705',
         organization_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2706',
-        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        auth_strategy_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2708',
+        dcr_provider_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2709'
       }
 
       const resp = await app.inject({
@@ -220,7 +231,7 @@ describe('dcr handlers', () => {
 
   describe('EventHook', () => {
     it('succeed on update', async () => {
-      const payload = {
+      const payload: EventHook = {
         event_type: 'update_application',
         client_id: 'id',
         application_id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
@@ -231,7 +242,9 @@ describe('dcr handlers', () => {
         developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
         redirect_uris: [
           'https://example.com'
-        ]
+        ],
+        auth_strategy_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2708',
+        dcr_provider_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2709'
       }
 
       const resp = await app.inject({
@@ -248,7 +261,7 @@ describe('dcr handlers', () => {
     })
 
     it('succeed on add registration', async () => {
-      const payload = {
+      const payload: EventHook = {
         event_type: 'add_registration',
         client_id: 'id',
         audience: 'audience',
@@ -258,7 +271,9 @@ describe('dcr handlers', () => {
         application_description: 'description',
         portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
         organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
-        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        auth_strategy_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2708',
+        dcr_provider_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2709'
       }
 
       const resp = await app.inject({
@@ -276,7 +291,7 @@ describe('dcr handlers', () => {
     })
 
     it('succeed on remove registration', async () => {
-      const payload = {
+      const payload: EventHook = {
         event_type: 'remove_registration',
         client_id: 'id',
         audience: 'audience',
@@ -286,7 +301,9 @@ describe('dcr handlers', () => {
         application_description: 'description',
         portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
         organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
-        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707'
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        auth_strategy_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2708',
+        dcr_provider_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2709'
       }
 
       const resp = await app.inject({
@@ -304,7 +321,7 @@ describe('dcr handlers', () => {
     })
 
     it('fails because of a wrong API token', async () => {
-      const payload = {
+      const payload: EventHook = {
         event_type: 'update_application',
         client_id: 'id',
         application_id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
@@ -315,7 +332,9 @@ describe('dcr handlers', () => {
         developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
         redirect_uris: [
           'https://example.com'
-        ]
+        ],
+        auth_strategy_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2708',
+        dcr_provider_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2709'
       }
 
       const resp = await app.inject({

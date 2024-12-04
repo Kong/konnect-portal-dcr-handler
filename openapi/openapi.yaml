@@ -176,6 +176,12 @@ components:
         developer_id:
           type: string
           format: uuid
+        auth_strategy_id:
+          type: string
+          format: uuid
+        dcr_provider_id:
+          type: string
+          format: uuid
       required:
       - event_type
       - client_id
@@ -185,6 +191,8 @@ components:
       - portal_id
       - organization_id
       - developer_id
+      - auth_strategy_id
+      - dcr_provider_id
     EventHookUpdateApplication:
       additionalProperties: false
       properties:
@@ -268,6 +276,10 @@ components:
           type: array
           items:
             type: string
+        scopes:
+          type: array
+          items:
+            type: string
         token_endpoint_auth_method:
           type: string
         application_description:
@@ -281,15 +293,24 @@ components:
         developer_id:
           type: string
           format: uuid
+        auth_strategy_id:
+          type: string
+          format: uuid
+        dcr_provider_id:
+          type: string
+          format: uuid
       required:
       - redirect_uris
       - client_name
       - grant_types
+      - scopes
       - token_endpoint_auth_method
       - application_description
       - portal_id
       - organization_id
       - developer_id
+      - auth_strategy_id
+      - dcr_provider_id
     ApplicationResponse:
       type: object
       additionalProperties: false

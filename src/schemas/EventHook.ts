@@ -16,6 +16,8 @@ export type EventHook = {
   portal_id: string
   organization_id: string
   developer_id: string
+  auth_strategy_id: string
+  dcr_provider_id: string
 } & (
   | {
     redirect_uris: string[]
@@ -69,6 +71,12 @@ export const EventHookSchema = {
     developer_id: {
       type: 'string'
     },
+    auth_strategy_id: {
+      type: 'string'
+    },
+    dcr_provider_id: {
+      type: 'string'
+    },
     api_product_version_id: {
       type: 'string'
     },
@@ -86,7 +94,9 @@ export const EventHookSchema = {
       'application_description',
       'portal_id',
       'organization_id',
-      'developer_id'
+      'developer_id',
+      'auth_strategy_id',
+      'dcr_provider_id'
     ],
   allOf: [
     {

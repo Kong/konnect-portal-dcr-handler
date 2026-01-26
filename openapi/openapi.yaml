@@ -70,6 +70,51 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+  /{clientId}/secrets:
+    parameters:
+    - $ref: '#/components/parameters/clientId'
+    get:
+      summary: List client secrets
+      description: |
+        Lists all client secrets for the application. Returns metadata only,
+        not the actual secret values (security best practice).
+      responses:
+        '200':
+          $ref: '#/components/responses/SecretList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create a new client secret
+      description: |
+        Creates an additional client secret for the application.
+        The secret value is only returned in this response (one-time).
+        Note: Some IDPs limit the number of secrets (e.g., Okta allows max 2).
+      responses:
+        '201':
+          $ref: '#/components/responses/NewSecretWithId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /{clientId}/secrets/{secretId}:
+    parameters:
+    - $ref: '#/components/parameters/clientId'
+    - $ref: '#/components/parameters/secretId'
+    delete:
+      summary: Delete a specific client secret
+      description: |
+        Deletes a specific client secret by ID. The handler will
+        automatically deactivate the secret before deletion if required
+        by the IDP (e.g., Okta).
+      responses:
+        '204':
+          description: Secret successfully deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 components:
   parameters:
     clientId:
@@ -79,6 +124,15 @@ components:
       description: |
         ID of the application in the IDP. This is the ID used accross
         the system and is unique. The format can vary between IDPs.
+      schema:
+        type: string
+    secretId:
+      name: secretId
+      in: path
+      required: true
+      description: |
+        ID of the specific secret in the IDP. This is the IDP-specific
+        identifier returned when listing secrets.
       schema:
         type: string
   requestBodies:
@@ -119,6 +173,18 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/SecretResponse'
+    SecretList:
+      description: List of client secrets (metadata only)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SecretListResponse'
+    NewSecretWithId:
+      description: Newly created secret with ID
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SecretWithIdResponse'
   schemas:
     ClientId:
       type: string
@@ -339,6 +405,71 @@ components:
         client_secret:
           $ref: '#/components/schemas/ClientSecret'
       required:
+      - client_id
+      - client_secret
+    SecretId:
+      type: string
+      description: |
+        IDP-specific identifier for the secret. Format varies by IDP.
+      example: "ocsXXXXXXXXXXX"
+    SecretStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - INACTIVE
+      description: Status of the client secret
+    SecretMetadata:
+      type: object
+      additionalProperties: false
+      properties:
+        secret_id:
+          $ref: '#/components/schemas/SecretId'
+        client_id:
+          $ref: '#/components/schemas/ClientId'
+        status:
+          $ref: '#/components/schemas/SecretStatus'
+        created_at:
+          type: string
+          format: date-time
+          description: When the secret was created
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the secret expires (if applicable)
+      required:
+      - secret_id
+      - client_id
+      - status
+    SecretListResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        secrets:
+          type: array
+          items:
+            $ref: '#/components/schemas/SecretMetadata'
+      required:
+      - secrets
+    SecretWithIdResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        secret_id:
+          $ref: '#/components/schemas/SecretId'
+        client_id:
+          $ref: '#/components/schemas/ClientId'
+        client_secret:
+          $ref: '#/components/schemas/ClientSecret'
+        created_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - secret_id
       - client_id
       - client_secret
   securitySchemes:

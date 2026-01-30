@@ -375,4 +375,165 @@ describe('dcr handlers', () => {
       expect(parsedBody.error_description[0].params.missingProperty).toBe('event_type')
     })
   })
+
+  describe('List Secrets', () => {
+    it('succeed', async () => {
+      jest.spyOn(mockAxios, 'get').mockResolvedValueOnce({
+        data: [
+          {
+            id: 'ocs123456789',
+            status: 'ACTIVE',
+            created: '2024-01-01T00:00:00Z',
+            expiresAt: null
+          },
+          {
+            id: 'ocs987654321',
+            status: 'INACTIVE',
+            created: '2024-01-02T00:00:00Z',
+            expiresAt: '2025-01-02T00:00:00Z'
+          }
+        ],
+        status: 200
+      } as any)
+
+      const resp = await app.inject({
+        method: 'GET',
+        url: '/someClientId/secrets',
+        headers: {
+          'X-API-KEY': app.config.KONG_API_TOKENS[0]
+        }
+      })
+
+      expect(resp.statusCode).toEqual(200)
+      expect(resp.json()).toEqual({
+        secrets: [
+          {
+            secret_id: 'ocs123456789',
+            client_id: 'someClientId',
+            status: 'ACTIVE',
+            created_at: '2024-01-01T00:00:00Z',
+            expires_at: null
+          },
+          {
+            secret_id: 'ocs987654321',
+            client_id: 'someClientId',
+            status: 'INACTIVE',
+            created_at: '2024-01-02T00:00:00Z',
+            expires_at: '2025-01-02T00:00:00Z'
+          }
+        ]
+      })
+      expect(mockAxios.get).toHaveBeenCalledTimes(1)
+    })
+
+    it('fails because of a wrong API token', async () => {
+      const resp = await app.inject({
+        method: 'GET',
+        url: '/someClientId/secrets',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      expect(resp.statusCode).toEqual(401)
+      expect(resp.body).toEqual(JSON.stringify({ error: 'Wrong API-Key', error_description: 'wrong x-api-key header' }))
+      expect(mockAxios.get).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Create Secret', () => {
+    it('succeed', async () => {
+      jest.spyOn(mockAxios, 'post').mockResolvedValueOnce({
+        data: {
+          id: 'ocs123456789',
+          client_secret: 'newSecretValue123',
+          created: '2024-01-01T00:00:00Z',
+          expiresAt: null
+        },
+        status: 201
+      } as any)
+
+      const resp = await app.inject({
+        method: 'POST',
+        url: '/someClientId/secrets',
+        headers: {
+          'X-API-KEY': app.config.KONG_API_TOKENS[0]
+        }
+      })
+
+      expect(resp.statusCode).toEqual(201)
+      expect(resp.json()).toEqual({
+        secret_id: 'ocs123456789',
+        client_id: 'someClientId',
+        client_secret: 'newSecretValue123',
+        created_at: '2024-01-01T00:00:00Z',
+        expires_at: null
+      })
+      expect(mockAxios.post).toHaveBeenCalledTimes(1)
+    })
+
+    it('fails because of a wrong API token', async () => {
+      const resp = await app.inject({
+        method: 'POST',
+        url: '/someClientId/secrets'
+      })
+
+      expect(resp.statusCode).toEqual(401)
+      expect(resp.body).toEqual(JSON.stringify({ error: 'Wrong API-Key', error_description: 'wrong x-api-key header' }))
+      expect(mockAxios.post).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Delete Secret', () => {
+    it('succeed with deactivation', async () => {
+      jest.spyOn(mockAxios, 'post').mockResolvedValueOnce({ status: 200 } as any)
+      jest.spyOn(mockAxios, 'delete').mockResolvedValueOnce({ status: 204 } as any)
+
+      const resp = await app.inject({
+        method: 'DELETE',
+        url: '/someClientId/secrets/someSecretId',
+        headers: {
+          'X-API-KEY': app.config.KONG_API_TOKENS[0]
+        }
+      })
+
+      expect(resp.statusCode).toEqual(204)
+      expect(mockAxios.post).toHaveBeenCalledTimes(1)
+      expect(mockAxios.delete).toHaveBeenCalledTimes(1)
+    })
+
+    it('succeed when already inactive', async () => {
+      jest.spyOn(mockAxios, 'post').mockRejectedValueOnce({
+        response: { status: 400 }
+      })
+      jest.spyOn(mockAxios, 'delete').mockResolvedValueOnce({ status: 204 } as any)
+
+      const resp = await app.inject({
+        method: 'DELETE',
+        url: '/someClientId/secrets/someSecretId',
+        headers: {
+          'X-API-KEY': app.config.KONG_API_TOKENS[0]
+        }
+      })
+
+      expect(resp.statusCode).toEqual(204)
+      expect(mockAxios.post).toHaveBeenCalledTimes(1)
+      expect(mockAxios.delete).toHaveBeenCalledTimes(1)
+    })
+
+    it('fails because of a wrong API token', async () => {
+      const resp = await app.inject({
+        method: 'DELETE',
+        url: '/someClientId/secrets/someSecretId',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      expect(resp.statusCode).toEqual(401)
+      expect(resp.body).toEqual(JSON.stringify({ error: 'Wrong API-Key', error_description: 'wrong x-api-key header' }))
+      expect(mockAxios.post).not.toHaveBeenCalled()
+      expect(mockAxios.delete).not.toHaveBeenCalled()
+    })
+  })
 })

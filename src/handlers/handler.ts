@@ -105,6 +105,95 @@ export function DCRHandlers (fastify: FastifyInstance, _: RegisterOptions, next:
     }
   })
 
+  // GET /:client_id/secrets - List all secrets
+  fastify.route({
+    url: '/:client_id/secrets',
+    method: 'GET',
+    handler: async function (
+      request: FastifyRequest<{ Params: { client_id: string } }>,
+      reply: FastifyReply
+    ): Promise<FastifyReply> {
+      const headers = getHeaders(fastify.config.OKTA_API_TOKEN)
+
+      const response = await fastify.httpClient.get(
+        `oauth2/v1/clients/${request.params.client_id}/credentials/secrets`,
+        { headers }
+      )
+
+      const secrets = response.data.map((secret: { id: string, status: string, created: string, expiresAt?: string }) => ({
+        secret_id: secret.id,
+        client_id: request.params.client_id,
+        status: secret.status,
+        created_at: secret.created,
+        expires_at: secret.expiresAt ?? null
+      }))
+
+      return reply.code(200).send({ secrets })
+    }
+  })
+
+  // POST /:client_id/secrets - Create new secret
+  fastify.route({
+    url: '/:client_id/secrets',
+    method: 'POST',
+    handler: async function (
+      request: FastifyRequest<{ Params: { client_id: string } }>,
+      reply: FastifyReply
+    ): Promise<FastifyReply> {
+      const headers = getHeaders(fastify.config.OKTA_API_TOKEN)
+
+      const response = await fastify.httpClient.post(
+        `oauth2/v1/clients/${request.params.client_id}/credentials/secrets`,
+        {},
+        { headers }
+      )
+
+      return reply.code(201).send({
+        secret_id: response.data.id,
+        client_id: request.params.client_id,
+        client_secret: response.data.client_secret,
+        created_at: response.data.created,
+        expires_at: response.data.expiresAt ?? null
+      })
+    }
+  })
+
+  // DELETE /:client_id/secrets/:secret_id - Delete specific secret
+  fastify.route({
+    url: '/:client_id/secrets/:secret_id',
+    method: 'DELETE',
+    handler: async function (
+      request: FastifyRequest<{ Params: { client_id: string, secret_id: string } }>,
+      reply: FastifyReply
+    ): Promise<FastifyReply> {
+      const headers = getHeaders(fastify.config.OKTA_API_TOKEN)
+      const { client_id: clientId, secret_id: secretId } = request.params
+
+      // Step 1: Deactivate the secret (Okta requires this before deletion)
+      try {
+        await fastify.httpClient.post(
+          `oauth2/v1/clients/${clientId}/credentials/secrets/${secretId}/lifecycle/deactivate`,
+          {},
+          { headers }
+        )
+      } catch (error: unknown) {
+        // Ignore if already inactive
+        const axiosError = error as { response?: { status?: number } }
+        if (axiosError.response?.status !== 400) {
+          throw error
+        }
+      }
+
+      // Step 2: Delete the secret
+      await fastify.httpClient.delete(
+        `oauth2/v1/clients/${clientId}/credentials/secrets/${secretId}`,
+        { headers }
+      )
+
+      return reply.code(204).send()
+    }
+  })
+
   next()
 }
 

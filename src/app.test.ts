@@ -383,14 +383,12 @@ describe('dcr handlers', () => {
           {
             id: 'ocs123456789',
             status: 'ACTIVE',
-            created: '2024-01-01T00:00:00Z',
-            expiresAt: null
+            created: '2024-01-01T00:00:00Z'
           },
           {
             id: 'ocs987654321',
             status: 'INACTIVE',
-            created: '2024-01-02T00:00:00Z',
-            expiresAt: '2025-01-02T00:00:00Z'
+            created: '2024-01-02T00:00:00Z'
           }
         ],
         status: 200
@@ -419,7 +417,7 @@ describe('dcr handlers', () => {
             client_id: 'someClientId',
             status: 'INACTIVE',
             created_at: '2024-01-02T00:00:00Z',
-            expires_at: '2025-01-02T00:00:00Z'
+            expires_at: null
           }
         ]
       })

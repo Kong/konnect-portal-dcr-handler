@@ -5,6 +5,15 @@ import type { ApplicationPayload } from '../schemas/ApplicationPayload'
 import { ApplicationPayloadSchema } from '../schemas/ApplicationPayload'
 import { EventHookSchema } from '../schemas/EventHook'
 
+interface OktaCredential {
+  id: string
+  created: string
+  lastUpdated: string
+  status: 'ACTIVE' | 'INACTIVE' | string
+  client_secret: string
+  secret_hash: string
+}
+
 /**
  * DCRHandlers registers the fastify plugin for Konnect DCR handlers in the fastify instance
  * it implements all the required routes and also protects the endpoints for with the `x-api-key` header
@@ -116,16 +125,16 @@ export function DCRHandlers (fastify: FastifyInstance, _: RegisterOptions, next:
       const headers = getHeaders(fastify.config.OKTA_API_TOKEN)
 
       const response = await fastify.httpClient.get(
-        `oauth2/v1/clients/${request.params.client_id}/credentials/secrets`,
+        `/api/v1/apps/${request.params.client_id}/credentials/secrets`,
         { headers }
       )
 
-      const secrets = response.data.map((secret: { id: string, status: string, created: string, expiresAt?: string }) => ({
+      const secrets = response.data.map((secret: OktaCredential) => ({
         secret_id: secret.id,
         client_id: request.params.client_id,
         status: secret.status,
         created_at: secret.created,
-        expires_at: secret.expiresAt ?? null
+        expires_at: null
       }))
 
       return reply.code(200).send({ secrets })
@@ -142,8 +151,8 @@ export function DCRHandlers (fastify: FastifyInstance, _: RegisterOptions, next:
     ): Promise<FastifyReply> {
       const headers = getHeaders(fastify.config.OKTA_API_TOKEN)
 
-      const response = await fastify.httpClient.post(
-        `oauth2/v1/clients/${request.params.client_id}/credentials/secrets`,
+      const response: { data: OktaCredential } = await fastify.httpClient.post(
+        `/api/v1/apps/${request.params.client_id}/credentials/secrets`,
         {},
         { headers }
       )
@@ -153,7 +162,7 @@ export function DCRHandlers (fastify: FastifyInstance, _: RegisterOptions, next:
         client_id: request.params.client_id,
         client_secret: response.data.client_secret,
         created_at: response.data.created,
-        expires_at: response.data.expiresAt ?? null
+        expires_at: null
       })
     }
   })
@@ -172,7 +181,7 @@ export function DCRHandlers (fastify: FastifyInstance, _: RegisterOptions, next:
       // Step 1: Deactivate the secret (Okta requires this before deletion)
       try {
         await fastify.httpClient.post(
-          `oauth2/v1/clients/${clientId}/credentials/secrets/${secretId}/lifecycle/deactivate`,
+          `api/v1/apps/${clientId}/credentials/secrets/${secretId}/lifecycle/deactivate`,
           {},
           { headers }
         )
@@ -186,7 +195,7 @@ export function DCRHandlers (fastify: FastifyInstance, _: RegisterOptions, next:
 
       // Step 2: Delete the secret
       await fastify.httpClient.delete(
-        `oauth2/v1/clients/${clientId}/credentials/secrets/${secretId}`,
+        `api/v1/apps/${clientId}/credentials/secrets/${secretId}`,
         { headers }
       )
 

@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: DCR HTTP integration
-  version: 0.0.1
+  version: 0.0.2
   description: |
     Specification of the open api spec that should be implemented to
     support the konnect DCR http integration.
@@ -44,6 +44,9 @@ paths:
       summary: rotates client_secret
       description: |
         Rotates the secret of the application, making the current one unusable.
+
+        **Note:** If more than one secret exisits, this endpoint will return an error.
+       
       responses:
         '200':
           $ref: '#/components/responses/NewSecret'
@@ -80,6 +83,7 @@ paths:
 
         Lists all client secrets for the application. Returns metadata only,
         not the actual secret values (security best practice).
+
       responses:
         '200':
           $ref: '#/components/responses/SecretList'
@@ -95,6 +99,9 @@ paths:
         Creates an additional client secret for the application.
         The secret value is only returned in this response (one-time).
         Note: Some IDPs limit the number of secrets (e.g., Okta allows max 2).
+
+        **Note:** This endpoint is only available when `allow_multiple_credentials`
+        is enabled in the DCR configuration.
       responses:
         '201':
           $ref: '#/components/responses/NewSecretWithId'
@@ -114,6 +121,9 @@ paths:
         Deletes a specific client secret by ID. The handler will
         automatically deactivate the secret before deletion if required
         by the IDP (e.g., Okta).
+
+        **Note:** This endpoint is only available when `allow_multiple_credentials`
+        is enabled in the DCR configuration.
       responses:
         '204':
           description: Secret successfully deleted

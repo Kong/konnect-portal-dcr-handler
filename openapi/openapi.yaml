@@ -79,8 +79,6 @@ paths:
     get:
       summary: List client secrets
       description: |
-        **BETA: This endpoint is in development and may change before GA.**
-
         Lists all client secrets for the application. Returns metadata only,
         not the actual secret values (security best practice).
 
@@ -94,8 +92,6 @@ paths:
     post:
       summary: Create a new client secret
       description: |
-        **BETA: This endpoint is in development and may change before GA.**
-
         Creates an additional client secret for the application.
         The secret value is only returned in this response (one-time).
         Note: Some IDPs limit the number of secrets (e.g., Okta allows max 2).
@@ -116,8 +112,6 @@ paths:
     delete:
       summary: Delete a specific client secret
       description: |
-        **BETA: This endpoint is in development and may change before GA.**
-
         Deletes a specific client secret by ID. The handler will
         automatically deactivate the secret before deletion if required
         by the IDP (e.g., Okta).

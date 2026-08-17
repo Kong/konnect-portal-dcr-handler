@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: DCR HTTP integration
-  version: 0.0.2
+  version: 0.1.0
   description: |
     Specification of the open api spec that should be implemented to
     support the konnect DCR http integration.

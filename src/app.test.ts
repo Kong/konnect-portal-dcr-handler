@@ -34,6 +34,7 @@ describe('dcr handlers', () => {
         portal_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2705',
         organization_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2706',
         developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        owner: { type: 'developer', id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707' },
         auth_strategy_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2708',
         dcr_provider_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2709'
       }
@@ -88,6 +89,7 @@ describe('dcr handlers', () => {
         portal_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2705',
         organization_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2706',
         developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        owner: { type: 'developer', id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707' },
         auth_strategy_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2708',
         dcr_provider_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2709'
       }
@@ -240,6 +242,7 @@ describe('dcr handlers', () => {
         portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
         organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
         developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        owner: { type: 'developer', id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707' },
         redirect_uris: [
           'https://example.com'
         ],
@@ -272,6 +275,7 @@ describe('dcr handlers', () => {
         portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
         organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
         developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        owner: { type: 'developer', id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707' },
         auth_strategy_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2708',
         dcr_provider_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2709'
       }
@@ -302,6 +306,7 @@ describe('dcr handlers', () => {
         portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
         organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
         developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        owner: { type: 'developer', id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707' },
         auth_strategy_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2708',
         dcr_provider_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2709'
       }
@@ -330,6 +335,7 @@ describe('dcr handlers', () => {
         portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
         organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
         developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        owner: { type: 'developer', id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707' },
         redirect_uris: [
           'https://example.com'
         ],

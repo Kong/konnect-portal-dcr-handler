@@ -46,7 +46,7 @@ paths:
         Rotates the secret of the application, making the current one unusable.
 
         **Note:** If more than one secret exisits, this endpoint will return an error.
-       
+
       responses:
         '200':
           $ref: '#/components/responses/NewSecret'

@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: DCR HTTP integration
-  version: 0.0.2
+  version: 0.1.0
   description: |
     Specification of the open api spec that should be implemented to
     support the konnect DCR http integration.
@@ -209,6 +209,37 @@ components:
         calls to the IDP and verify its identity. Konnect doesn't store this
         data, if the secret is lost user should refresh the secret.
       example: "*8pNH%|(9PRH|r3q$#6!*z0B}jMbtQ]-"
+    DeveloperId:
+      type: string
+      format: uuid
+      description: |
+        ID of the developer whose action triggered the event. When the event is
+        triggered by a Konnect admin action rather than a developer action, this
+        is the null UUID `00000000-0000-0000-0000-000000000000`.
+
+        This identifies the *actor*, not the owner of the application. Use
+        `owner` to determine which entity the application belongs to.
+      example: 6a2b1f8c-1d0e-4c2f-9a3b-5e6d7c8f9a0b
+    Owner:
+      type: object
+      additionalProperties: false
+      description: |
+        The entity that owns the application. An application is owned by either
+        a single developer or a single team.
+      properties:
+        type:
+          type: string
+          enum:
+          - developer
+          - team
+        id:
+          type: string
+          format: uuid
+          description: |
+            ID of the owning developer or team, depending on `type`.
+      required:
+      - type
+      - id
     EventType:
       type: string
       enum:
@@ -250,8 +281,9 @@ components:
           type: string
           format: uuid
         developer_id:
-          type: string
-          format: uuid
+          $ref: '#/components/schemas/DeveloperId'
+        owner:
+          $ref: '#/components/schemas/Owner'
         auth_strategy_id:
           type: string
           format: uuid
@@ -267,6 +299,7 @@ components:
       - portal_id
       - organization_id
       - developer_id
+      - owner
       - auth_strategy_id
       - dcr_provider_id
     EventHookUpdateApplication:
@@ -367,8 +400,9 @@ components:
           type: string
           format: uuid
         developer_id:
-          type: string
-          format: uuid
+          $ref: '#/components/schemas/DeveloperId'
+        owner:
+          $ref: '#/components/schemas/Owner'
         auth_strategy_id:
           type: string
           format: uuid
@@ -385,6 +419,7 @@ components:
       - portal_id
       - organization_id
       - developer_id
+      - owner
       - auth_strategy_id
       - dcr_provider_id
     ApplicationResponse:

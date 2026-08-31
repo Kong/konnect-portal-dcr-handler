@@ -8,6 +8,10 @@ export interface ApplicationPayload {
   portal_id: string
   organization_id: string
   developer_id: string
+  owner: {
+    type: 'developer' | 'team'
+    id: string
+  }
   auth_strategy_id: string
   dcr_provider_id: string
 }
@@ -55,6 +59,21 @@ export const ApplicationPayloadSchema = {
       type: 'string',
       format: 'uuid'
     },
+    owner: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        type: {
+          type: 'string',
+          enum: ['developer', 'team']
+        },
+        id: {
+          type: 'string',
+          format: 'uuid'
+        }
+      },
+      required: ['type', 'id']
+    },
     auth_strategy_id: {
       type: 'string',
       format: 'uuid'
@@ -74,6 +93,7 @@ export const ApplicationPayloadSchema = {
     'portal_id',
     'organization_id',
     'developer_id',
+    'owner',
     'auth_strategy_id',
     'dcr_provider_id'
   ]

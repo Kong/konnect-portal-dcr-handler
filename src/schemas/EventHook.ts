@@ -16,6 +16,10 @@ export type EventHook = {
   portal_id: string
   organization_id: string
   developer_id: string
+  owner: {
+    type: 'developer' | 'team'
+    id: string
+  }
   auth_strategy_id: string
   dcr_provider_id: string
 } & (
@@ -71,6 +75,21 @@ export const EventHookSchema = {
     developer_id: {
       type: 'string'
     },
+    owner: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        type: {
+          type: 'string',
+          enum: ['developer', 'team']
+        },
+        id: {
+          type: 'string',
+          format: 'uuid'
+        }
+      },
+      required: ['type', 'id']
+    },
     auth_strategy_id: {
       type: 'string'
     },
@@ -95,6 +114,7 @@ export const EventHookSchema = {
       'portal_id',
       'organization_id',
       'developer_id',
+      'owner',
       'auth_strategy_id',
       'dcr_provider_id'
     ],

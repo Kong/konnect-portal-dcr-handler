@@ -16,7 +16,11 @@ export type EventHook = {
   portal_id: string
   organization_id: string
   developer_id: string
-  owner: {
+  /**
+   * The entity that owns the application. Optional: not every portal sends
+   * it. Fall back to `developer_id` when it is absent.
+   */
+  owner?: {
     type: 'developer' | 'team'
     id: string
   }
@@ -114,7 +118,6 @@ export const EventHookSchema = {
       'portal_id',
       'organization_id',
       'developer_id',
-      'owner',
       'auth_strategy_id',
       'dcr_provider_id'
     ],

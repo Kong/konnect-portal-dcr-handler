@@ -72,6 +72,54 @@ describe('dcr handlers', () => {
       await app.close()
     })
 
+    it('succeed without an owner', async () => {
+      // Legacy v2 portals have no team concept and omit `owner`.
+      const payload: ApplicationPayload = {
+        redirect_uris: [
+          'https://example.com'
+        ],
+        client_name: 'test',
+        grant_types: [
+          'authorization_code', 'refresh_token', 'implicit'
+        ],
+        scopes: [
+          'openid', 'profile'
+        ],
+        token_endpoint_auth_method: 'client_secret_post',
+        application_description: 'disisatest',
+        portal_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2705',
+        organization_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2706',
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        auth_strategy_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2708',
+        dcr_provider_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2709'
+      }
+
+      jest.spyOn(mockAxios, 'post').mockResolvedValueOnce({
+        data: {
+          client_id: 'id',
+          client_id_issued_at: 1700825336,
+          client_secret: 'secret',
+          client_secret_expires_at: 0
+        },
+        status: 201
+      } as any)
+
+      const resp = await app.inject({
+        method: 'POST',
+        url: '/',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': app.config.KONG_API_TOKENS[0]
+        },
+        payload
+      })
+
+      expect(resp.statusCode).toEqual(201)
+      expect(mockAxios.post).toHaveBeenCalledTimes(1)
+
+      await app.close()
+    })
+
     it('fails because of a wrong API token', async () => {
       const payload: ApplicationPayload = {
         redirect_uris: [
@@ -321,6 +369,37 @@ describe('dcr handlers', () => {
         payload
       })
       console.log(resp)
+
+      expect(resp.statusCode).toEqual(200)
+    })
+
+    it('succeed on update without an owner', async () => {
+      // Legacy v2 portals have no team concept and omit `owner`.
+      const payload: EventHook = {
+        event_type: 'update_application',
+        client_id: 'id',
+        application_id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        application_name: 'name',
+        application_description: 'description',
+        portal_id: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
+        organization_id: '3fa85f64-5717-4562-b3fc-2c963f66afa8',
+        developer_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2707',
+        redirect_uris: [
+          'https://example.com'
+        ],
+        auth_strategy_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2708',
+        dcr_provider_id: '426ac0a7-aeb6-4043-a404-c4bfe24f2709'
+      }
+
+      const resp = await app.inject({
+        method: 'POST',
+        url: '/someId/event-hook',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': app.config.KONG_API_TOKENS[0]
+        },
+        payload
+      })
 
       expect(resp.statusCode).toEqual(200)
     })

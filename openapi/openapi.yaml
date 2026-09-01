@@ -226,6 +226,9 @@ components:
       description: |
         The entity that owns the application. An application is owned by either
         a single developer or a single team.
+
+        This property is optional and may be absent. Handlers must not require
+        it. Fall back to `developer_id` when it is missing.
       properties:
         type:
           type: string
@@ -299,7 +302,6 @@ components:
       - portal_id
       - organization_id
       - developer_id
-      - owner
       - auth_strategy_id
       - dcr_provider_id
     EventHookUpdateApplication:
@@ -419,7 +421,6 @@ components:
       - portal_id
       - organization_id
       - developer_id
-      - owner
       - auth_strategy_id
       - dcr_provider_id
     ApplicationResponse:
